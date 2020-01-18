@@ -46,7 +46,6 @@ print(type(data_drop_column['Final_result'].values)) # numpy 의 ndarray 자료�
 
 print(data_drop_column.iloc[2]) # 데이터 어떤 value 들을 가지는지 그냥 눈으로 확인하려고 해봄
 
-봄
 
 # 칼럼 값들 뽑아보다가 주소도 뽑아봤는데 몇가지 없을 것 같아서 한번 확인해보니
 # 여기서는 서울 부산밖에 안다루니까 두개를 구분지어서 또 활용하면 괜찮다고 생각했다.
@@ -72,11 +71,11 @@ print("-------")
 
 
 #시각화 5개 이상 (subplot 활용)
-plt.plot(data_drop_column['Hammer_price'])
-plt.show()
-
-plt.plot(data_drop_column['Auction_count'])
-plt.show()
+# plt.plot(data_drop_column['Hammer_price'])
+# plt.show()
+#
+# plt.plot(data_drop_column['Auction_count'])
+# plt.show()
 
 '''
  일단 전체 row들의 특정 칼럼 별로 데이터를 본 결과로 매우 다양하게 있고 서로 연관관계가
@@ -85,16 +84,40 @@ plt.show()
  Claim_price : 경매 신청인의 청구 금액
  Auction_count : 경매 횟수
  Auction_miscarriage_count : 총 유찰 횟수
- Total_land_gross_area:총 토지 전체 면
+ Total_land_gross_area:총 토지 전체 면적
  addr_do : 시_도
  Total_appraisal_price : 총 감정가
  Minimum_sales_price : 최저매각가격
  Hammer_price(target) : 낙찰가
 '''
 
+# plt.scatter(x=data_drop_column['Claim_price'], y=data_drop_column['Hammer_price'])
+# plt.show()
+
+# 1. 토지 면적당 가격 (단위 : 1 m^2)
+# 변수 명 : m_per_price
+
+m_per_price = []
+Area = list(data_drop_column['Total_land_gross_area'].values)
+Hammer_Price = list(data_drop_column['Hammer_price'].values)
+
+for i, price in enumerate(Hammer_Price):
+    if Area[i] == 0:
+        m_per_price.append(0)
+    else:
+        temp = price / Area[i]
+        m_per_price.append(temp)
 
 
-plt.scatter(x=data_drop_column['Claim_price'], y=data_drop_column['Hammer_price'])
-plt.show()
+# 2. 경매가 유찰 될 확률 (경매 횟수에 비례한 유찰 경우)
+# 변수 명 : Auction_success
 
-#sns.lmplot(x='')
+Auction_success = []
+Auction_count = list(data_drop_column['Auction_count'].values)
+Auction_f_count = list(data_drop_column['Auction_miscarriage_count'].values)
+
+for i, tot_count in enumerate(Auction_count):
+    if Auction_f_count[i] == 0:
+        Auction_success.append(0)
+    else:
+        Auction_success.append(Auction_f_count[i] / tot_count)
