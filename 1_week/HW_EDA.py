@@ -31,13 +31,14 @@ data_drop_column = data.dropna(axis=1)
 
 #Heatmap 출력
 sns.heatmap(data=data_drop_column.corr())
-#plt.show()
+plt.show()
 
 
 #Histogram 출력
 data_drop_column.hist(bins=30)
-#plt.show()
+plt.show()
 
+initial_df = data_drop_column
 
 #DataFram index 접근
 # print(data_drop_column['addr_do']) # 자료형 확인 그리고 특정 칼럼이 값을 가지는 형태를 보려고 해봄
@@ -83,15 +84,27 @@ for i in data_drop_column['Final_result'].values:
 
 
 
-#시각화 5개 이상 (subplot 활용)
-# plt.plot(data_drop_column['Hammer_price'])
-# plt.show()
-#
-# plt.plot(data_drop_column['Auction_count'])
-# plt.show()
+# 시각화 5개 이상 (subplot 활용)
+
+plt.plot(data_drop_column['Hammer_price'])
+plt.show()
+
+plt.plot(data_drop_column['Auction_count'])
+plt.show()
+
+plt.plot(data_drop_column['Close_date'])
+plt.show()
+
+sns.barplot(data=data_drop_column, x='addr_do', y='Hammer_price')
+plt.show()
+
+sns.barplot(data=data_drop_column, x='addr_si', y='Hammer_price')
+plt.show()
+
+
 
 '''
- 일단 전체 row들의 특정 칼럼 별로 데이터를 본 결과로 매우 다양하게 있고 서로 연관관계가
+ 일단 전체 row들의 특정 칼럼 별로 데이터를 본 결과로 매우 다양하게 있고 서로 관계가
  있을 법한 column을 선정해보고 그 column 을 시각화 해볼 예정이다.
  
  Claim_price : 경매 신청인의 청구 금액
@@ -254,8 +267,6 @@ for i in range(0, len(data_drop_column)):
 
 
 data_drop_column["감정사 정확도 순위"] = company_rank_list_for_result
-print(data_drop_column)
-
 
 
 # 8. 토지 면적 대비 실 면적 비율 (토지 총 면적 과 실 면적 연산)
