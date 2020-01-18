@@ -1,3 +1,5 @@
+import operator
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -18,33 +20,31 @@ from matplotlib import pyplot as plt
 
 
 
-
 #데이터 입출력
 data = pd.read_csv("data/Auction_master_train.csv", sep=",")
-print(data)
+#print(data)
+
 
 #결측값이 있는 모든 열 제거
 data_drop_column = data.dropna(axis=1)
 
-print(data_drop_column)
-#print(data_drop_column.columns)
 
 #Heatmap 출력
 sns.heatmap(data=data_drop_column.corr())
-plt.show()
+#plt.show()
 
 
 #Histogram 출력
 data_drop_column.hist(bins=30)
-plt.show()
+#plt.show()
 
 
 #DataFram index 접근
-print(data_drop_column['addr_do']) # 이렇게 출력하면 자료형이 series type 임을 확인 그리고 특정 칼럼이 값을 가지는 형태를 보려고 해
-
-print(type(data_drop_column['Final_result'].values)) # numpy 의 ndarray 자료구조로 나옴
-
-print(data_drop_column.iloc[2]) # 데이터 어떤 value 들을 가지는지 그냥 눈으로 확인하려고 해봄
+# print(data_drop_column['addr_do']) # 이렇게 출력하면 자료형이 series type 임을 확인 그리고 특정 칼럼이 값을 가지는 형태를 보려고 해
+#
+# print(type(data_drop_column['Final_result'].values)) # numpy 의 ndarray 자료구조로 나옴
+#
+# print(data_drop_column.iloc[2]) # 데이터 어떤 value 들을 가지는지 그냥 눈으로 확인하려고 해봄
 
 
 # 칼럼 값들 뽑아보다가 주소도 뽑아봤는데 몇가지 없을 것 같아서 한번 확인해보니
@@ -54,9 +54,14 @@ addr_do_list = []
 for i in data_drop_column['addr_do'].values:
     if i not in addr_do_list:
         addr_do_list.append(i)
-        print(i + "추가")
-print("111")
-print(addr_do_list)
+#print(addr_do_list)
+
+
+addr_si_list = []
+for i in data_drop_column['addr_si'].values:
+    if i not in addr_si_list:
+        addr_si_list.append(i)
+# print(addr_si_list)
 
 
 # '+++'가 하나도 출력 안된걸 보니 유찰된 경매의 데이터는 들어가지 않았다.
@@ -67,7 +72,6 @@ for i in data_drop_column['Final_result'].values:
     if i != "낙찰":
         print("+++")
 print("-------")
-
 
 
 #시각화 5개 이상 (subplot 활용)
@@ -84,22 +88,26 @@ print("-------")
  Claim_price : 경매 신청인의 청구 금액
  Auction_count : 경매 횟수
  Auction_miscarriage_count : 총 유찰 횟수
- Total_land_gross_area:총 토지 전체 면적
+ Total_land_gross_area: 총 토지 전체 면적
  addr_do : 시_도
+ addr_si : 주소_시군구
  Total_appraisal_price : 총 감정가
  Minimum_sales_price : 최저매각가격
  Hammer_price(target) : 낙찰가
 '''
 
-# plt.scatter(x=data_drop_column['Claim_price'], y=data_drop_column['Hammer_price'])
-# plt.show()
+Claim_price = list(data_drop_column['Claim_price'].values)
+Area = list(data_drop_column['Total_land_gross_area'].values)
+Hammer_Price = list(data_drop_column['Hammer_price'].values)
+Auction_count = list(data_drop_column['Auction_count'].values)
+Auction_f_count = list(data_drop_column['Auction_miscarriage_count'].values)
+Minimum_sales_price = list(data_drop_column['Minimum_sales_price'].values)
+Total_appraisal_price = list(data_drop_column['Total_appraisal_price'].values)
 
 # 1. 토지 면적당 가격 (단위 : 1 m^2)
 # 변수 명 : m_per_price
 
 m_per_price = []
-Area = list(data_drop_column['Total_land_gross_area'].values)
-Hammer_Price = list(data_drop_column['Hammer_price'].values)
 
 for i, price in enumerate(Hammer_Price):
     if Area[i] == 0:
@@ -113,11 +121,58 @@ for i, price in enumerate(Hammer_Price):
 # 변수 명 : Auction_success
 
 Auction_success = []
-Auction_count = list(data_drop_column['Auction_count'].values)
-Auction_f_count = list(data_drop_column['Auction_miscarriage_count'].values)
 
 for i, tot_count in enumerate(Auction_count):
     if Auction_f_count[i] == 0:
         Auction_success.append(0)
     else:
         Auction_success.append(Auction_f_count[i] / tot_count)
+
+
+# 3. 경매 신청인의 이익 계산 (낙찰가 - 경매 청구 금액)
+# 변수 명 : final_revenue
+
+final_revenue = []
+
+for i, price in enumerate(Hammer_Price):
+    final_revenue.append(price - Claim_price[i])
+
+
+# 4. 경매가 활발한 지역 순위 지정 (시, 군으로 분류)
+# 변수 명 : Auction_frequency_rank_list
+
+Auction_frequency_rank_list = []
+
+Auction_frequency_rank = {}
+for si in addr_si_list:
+    Auction_frequency_rank[si] = 0
+
+for i in range(0, len(data_drop_column)):
+    for si in addr_si_list:
+        if data_drop_column.ix[i]['addr_si'] == si:
+            Auction_frequency_rank[si] += int(data_drop_column.ix[i]['Auction_count'])
+
+sortedArr = sorted(Auction_frequency_rank.items(), key=operator.itemgetter(1, 0), reverse=True)
+
+for i in sortedArr:
+    Auction_frequency_rank_list.append(i[0])
+
+
+# 5. 경매 상승 금액 (최저 입찰가와 낙찰가의 차액)
+# 변수 명 : margin_price
+
+margin_price = []
+
+for i, price in enumerate(Hammer_Price):
+    margin_price.append(price - Minimum_sales_price[i])
+
+
+# 6. 감정가와 낙찰가가 맞을 확률 (감정가가 낙찰가를 잘 예측했을 확률)
+#  변수 명 : appraisal_price_accuracy
+
+appraisal_price_accuracy = []
+
+sub_price = []
+for i, price in Hammer_Price:
+    sub_price.append(abs(price - Total_appraisal_price[i]))
+print(sub_price)
