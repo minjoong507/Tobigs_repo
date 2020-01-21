@@ -311,3 +311,16 @@ for i, close_date in enumerate(Close_date):
 data_drop_column["경매 진행기간"] = Auction_term
 
 print(data_drop_column)
+data_drop_column.head(10)
+
+df_result = pd.DataFrame()
+df_result["1m^2 당 가격"] = m_per_price
+df_result["유찰 확률"] = Auction_success
+df_result["경매 이익"] = final_revenue
+df_result["경매 빈번 지역 순위"] = rank_list_for_result
+df_result["경매 상승 금액"] = margin_price
+df_result["감정가 정확도"] = appraisal_price_accuracy
+df_result["감정사 정확도 순위"] = company_rank_list_for_result
+df_result["실 면적 비율"] = Real_area_ratio
+df_result["경매 종료 경과"] = elapse_time
+df_result["경매 진행기간"] = Auction_term
