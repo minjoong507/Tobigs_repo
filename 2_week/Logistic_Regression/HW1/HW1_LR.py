@@ -4,25 +4,36 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import statsmodels.api as sm
 from sklearn.metrics import *
+import matplotlib.pyplot as plt
 
 
 data = pd.read_csv("sampled_data.csv", sep=",")
 
-X_train, X_test, y_train, y_test = train_test_split(data.iloc[:, :-1], data.iloc[:, -1], random_state=0)
-classifier = LogisticRegression()
-classifier.fit(X_train, y_train)
-classifier.score(X_test, y_test)
-y_pred = classifier.predict(X_test)
+# X, y 분리
+X = data.iloc[:, :-1]
+y = data.iloc[:, -1]
 
-print(classifier.score(X_test, y_test))
-f1_score(y_test, y_pred)
+# Train, test set 분리
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
-scaler = StandardScaler()
-new_data = pd.DataFrame(scaler.fit_transform(X_train))
+# 스케일링
+ss = StandardScaler()
+X_train_s = ss.fit_transform(X_train)
+X_test_s = ss.transform(X_test)
 
-X_train2, X_test2, y_train2, y_test2 = train_test_split(new_data.iloc[:, :-1], new_data.iloc[:, -1], random_state=0)
+logreg = LogisticRegression()
+logreg.fit(X_train_s, y_train)
+logreg.score(X_test_s, y_test)
 
-classifier2 = LogisticRegression()
-classifier2.fit(X_train2, y_train2)
-print(classifier2.score(X_test2, y_test2))
+# confusion matrix
+y_pred = logreg.predict(X_test)
+print(confusion_matrix(y_pred, y_test))
 
+fpr, tpr, thresholds = roc_curve(y_test, logreg.decision_function(X_test))
+x = fpr
+y = tpr
+
+plt.plot(x,y) # 간단하게 ROC 그려볼 수 있음.
+plt.xlabel('1-Specificity')
+plt.ylabel('Sensitivity')
+plt.show()
