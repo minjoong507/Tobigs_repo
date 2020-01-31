@@ -27,9 +27,17 @@ logreg.score(X_test_s, y_test)
 
 # confusion matrix
 y_pred = logreg.predict(X_test)
-print(confusion_matrix(y_pred, y_test))
+conf_m = confusion_matrix(y_pred, y_test)
+print(conf_m)
+a = conf_m[0][0] + conf_m[1][1]
+sum = 0
+for row in conf_m:
+    for index in row:
+       sum += index
 
-fpr, tpr, thresholds = roc_curve(y_test, logreg.decision_function(X_test))
+print(a/sum)
+
+fpr, tpr, thresholds = roc_curve(y_test, logreg.decision_function(X_test_s))
 x = fpr
 y = tpr
 
@@ -37,3 +45,6 @@ plt.plot(x,y) # 간단하게 ROC 그려볼 수 있음.
 plt.xlabel('1-Specificity')
 plt.ylabel('Sensitivity')
 plt.show()
+print(thresholds)
+res = [[fpr_i, tpr_i, thres_i] for fpr_i, tpr_i, thres_i in zip(fpr, tpr, thresholds)]
+print(res)
