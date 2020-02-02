@@ -1,6 +1,12 @@
 import pandas as pd
 import numpy as np
 from numpy.linalg import inv
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import sklearn as sk
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+
 
 def estimate_beta(x, y):
     new_x = inv(np.dot(x.T, x))
@@ -50,6 +56,62 @@ addr_si_list = []
 for i in data['addr_si'].values:
     if i not in addr_si_list:
         addr_si_list.append(i)
+
+#선형회귀분석
+
+category_feature = [col for col in data.columns if data[col].dtypes == "object"]
+continuous_feature = data.drop(category_feature, axis=1)
+continuous_feature = continuous_feature.drop("Hammer_price", axis=1)
+
+print(category_feature)
+
+new_data = pd.DataFrame()
+for col in category_feature:
+    temp = []
+    temp_value = []
+    for index in data[col]:
+        if index not in temp:
+            temp.append(index)
+            temp_value.append(len(temp))
+
+        else:
+            for num, i in enumerate(temp):
+                if index == i:
+                    temp_value.append(num)
+    new_data[col] = temp_value
+
+X = pd.concat([new_data, continuous_feature], axis=1)
+y = data['Hammer_price']
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+ss = StandardScaler()
+X_train_s = ss.fit_transform(X_train)
+X_test_s = ss.transform(X_test)
+
+model = LinearRegression()
+model.fit(X_train_s, y_train)
+print(model.score(X_train, y_train))
+sk.metrics.mean_squared_error(y_train, model.predict(X_train))
+print(model.coef_)
+print(model.intercept_)
+
+print(model.score(X_test, y_test))
+y_pred = model.predict(X_test)
+plt.plot(y_test, y_pred, '.')
+
+x = np.linspace(0, 330, 100)
+y = x
+plt.plot(x,y)
+plt.show()
+
+
+
+
+
+
+
 
 
 
