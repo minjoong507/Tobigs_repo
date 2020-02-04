@@ -37,5 +37,23 @@ for i in range(len(X_test)):
 
 print(np.sign(svm_1.decision_function(X_test)) == np.sign(svm_2.decision_function(X_test)))
 print(np.sign(svm_1.decision_function(X_test)))
+
+print(svm_1.decision_function(X_test))
+print(svm_2.decision_function(X_test))
+print(svm_3.decision_function(X_test))
+
 print(svm_1.predict(X_test))
-# for i in range(len(X_test)):
+print(svm_2.predict(X_test))
+print(svm_3.predict(X_test))
+
+result = []
+for i in range(len(X_test)):
+    if (svm_1.decision_function(X_test)[i] >= svm_2.decision_function(X_test)[i]) \
+            and (svm_1.decision_function(X_test)[i] >= svm_3.decision_function(X_test)[i]):
+        result.append(1)
+    elif (svm_2.decision_function(X_test)[i] >= svm_1.decision_function(X_test)[i]) \
+            and (svm_2.decision_function(X_test)[i] >= svm_3.decision_function(X_test)[i]):
+        result.append(2)
+    else:
+        result.append(3)
+print(result)
