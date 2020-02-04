@@ -102,15 +102,6 @@ y = x
 plt.plot(x,y)
 plt.show()
 
-
-
-
-
-
-
-
-
-
 #1 X = 경도, 위도, 시/도 Y = 낙찰가
 
 data_do = []
