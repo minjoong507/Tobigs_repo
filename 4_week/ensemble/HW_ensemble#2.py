@@ -52,6 +52,41 @@ plt.ylabel('Z_SalePrice', fontsize=13)
 plt.xlabel('Z_GrLivArea', fontsize=13)
 # plt.show()
 
+ntrain = train.shape[0]
+ntest = test.shape[0]
+y_train = train.SalePrice.values
+all_data = pd.concat((train, test)).reset_index(drop=True)
+all_data.drop(['SalePrice'], axis=1, inplace=True)
+# print("all_data size is : {}".format(all_data.shape))
+
+all_data_na = (all_data.isnull().sum() / len(all_data)) * 100
+all_data_na = all_data_na.drop(all_data_na[all_data_na == 0].index).sort_values(ascending=False)[:30]
+missing_data = pd.DataFrame({'Missing Ratio' :all_data_na})
 
 
+f, ax = plt.subplots(figsize=(15, 12))
+plt.xticks(rotation='90')
+sns.barplot(x=all_data_na.index, y=all_data_na)
+plt.xlabel('Features', fontsize=15)
+plt.ylabel('Percent of missing values', fontsize=15)
+plt.title('Percent missing data by feature', fontsize=15)
 
+# print(all_data["PoolQC"])
+all_data["PoolQC"] = all_data["PoolQC"].fillna("None")
+# print(all_data["PoolQC"])
+print(all_data)
+
+
+print(all_data["LotFrontage"])
+print(all_data["Neighborhood"])
+all_data["LotFrontage"] = all_data.groupby("Neighborhood")["LotFrontage"].transform(
+    lambda x: x.fillna(x.mean()))
+
+print(all_data["BsmtExposure"])
+print(all_data["BsmtFinType1"])
+
+for i in all_data["BsmtQual"].isnull():
+    if i is True:
+        print("fuck")
+
+print(all_data['MSZoning'].mode()[0])
