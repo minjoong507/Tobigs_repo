@@ -74,19 +74,22 @@ plt.title('Percent missing data by feature', fontsize=15)
 # print(all_data["PoolQC"])
 all_data["PoolQC"] = all_data["PoolQC"].fillna("None")
 # print(all_data["PoolQC"])
-print(all_data)
-
-
-print(all_data["LotFrontage"])
-print(all_data["Neighborhood"])
+# print(all_data)
+#
+#
+# print(all_data["LotFrontage"])
+# print(all_data["Neighborhood"])
 all_data["LotFrontage"] = all_data.groupby("Neighborhood")["LotFrontage"].transform(
     lambda x: x.fillna(x.mean()))
 
-print(all_data["BsmtExposure"])
-print(all_data["BsmtFinType1"])
+# print(all_data["BsmtExposure"])
+# print(all_data["BsmtFinType1"])
+#
+# for i in all_data["BsmtQual"].isnull():
+#     if i is True:
+#         print("fuck")
+all_data['MSSubClass'] = all_data['MSSubClass'].to_string()
+print(all_data['OverallCond'])
 
-for i in all_data["BsmtQual"].isnull():
-    if i is True:
-        print("fuck")
 
-print(all_data['MSZoning'].mode()[0])
+
