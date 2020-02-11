@@ -130,22 +130,8 @@ for col in cols:
     all_data[col] = LE.fit_transform(all_data[col])
     print(all_data[col])
 
-# shape
-print(all_data['FireplaceQu'])
-print('Shape all_data: {}'.format(all_data.shape))
 
 
-
-X_train, X_val, y_train, y_val = train_test_split(train, test, random_state=49)
-
-gbrt = GradientBoostingRegressor(max_depth=2, n_estimators=120, random_state=42)
-gbrt.fit(X_train, y_train)
-
-# 최적의 트리 개수 찾기
-errors = [mean_squared_error(y_val, y_pred)
-          for y_pred in gbrt.staged_predict(X_val)]
-bst_n_estimators = np.argmin(errors)
-
-# 최적의 트리개수로 그래디언트 부스팅 학습
-gbrt_best = GradientBoostingRegressor(max_depth=2, n_estimators=bst_n_estimators, random_state=42)
-gbrt_best.fit(X_train, y_train)
+xgb.XGBRegressor
+lgb.LGBMRegressor
+AveragingModels
