@@ -87,3 +87,10 @@ def f1(x):
 key_min = min(dic.keys(), key=(lambda  k:dic[k]))
 
 print(key_min)
+
+sub1_df = pd_data[pd_data['age'] == 'middle_aged']
+temp_df = pd_data[pd_data['age'] == 'youth']
+temp2_df = pd_data[pd_data['age'] == 'senior']
+sub2_df = pd.concat([temp_df, temp2_df])
+print(sub2_df)
+
