@@ -11,6 +11,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import PCA
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
+
 
 def new_coordinates(X,eigenvectors):
     for i in range(eigenvectors.shape[0]):
@@ -59,13 +61,13 @@ df['y'] = y
 X = df.drop('y', axis=1)
 y = df['y']
 
-labels = []
-yList = y.tolist()
-for label in yList:
-    label = str(label)
-    if label[0] not in labels:
-        labels.append(label[0])
-print(labels)
+# labels = []
+# yList = y.tolist()
+# for label in yList:
+#     label = str(label)
+#     if label[0] not in labels:
+#         labels.append(label[0])
+# print(labels)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
@@ -73,8 +75,39 @@ scaler = StandardScaler()
 X_train_s = scaler.fit_transform(X_train)
 X_test_s = scaler.transform(X_test)
 
-pca = PCA(n_components=3)
-X_3d = pca.fit_transform(X_train_s)
+features = X_test_s.T
+cov_matrix = np.cov(features)
+eigenvalues = lin.eig(cov_matrix)[0]
+eigenvalues = np.sort(eigenvalues)[::-1]
+dimension_num = [i for i in range(1, len(eigenvalues)+1)]
+
+graph_dimension = pd.DataFrame()
+graph_dimension['eigenvalues'] = eigenvalues
+graph_dimension['dimension_num'] = dimension_num
+print(graph_dimension)
+
+fig, ax = plt.subplots()
+ax.scatter(x = graph_dimension['dimension_num'], y = graph_dimension['eigenvalues'])
+plt.ylabel('eigenvalues', fontsize=13)
+plt.xlabel('dimension_num', fontsize=13)
+plt.show()
+
+
+pca = PCA(n_components=18)
+X_18d = pca.fit_transform(X_train_s)
 
 rnd_clf = RandomForestClassifier(random_state=0)
-rnd_clf.fit(X_3d, y_train)
+rnd_clf.fit(X_18d, y_train)
+
+X_18d_test = pca.transform(X_test_s)
+
+y_pred_18 = rnd_clf.predict(X_18d_test)
+accuracy_18d = accuracy_score(y_test, y_pred_18)
+print(accuracy_18d)
+
+
+rnd_clf_2 = RandomForestClassifier(random_state=0)
+rnd_clf_2.fit(X_train_s, y_train)
+y_pred = rnd_clf_2.predict(X_test_s)
+accuracy_d = accuracy_score(y_test, y_pred)
+print(accuracy_d)
