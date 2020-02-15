@@ -20,6 +20,8 @@ y = data.iloc[:, -1]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=48)
 
+print(type(X_train))
+
 scal = StandardScaler()
 X_train_s = scal.fit_transform(X_train)
 X_test_s = scal.transform(X_test)
