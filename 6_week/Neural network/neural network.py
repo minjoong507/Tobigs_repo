@@ -1,6 +1,7 @@
 from random import seed
 from random import random
 import numpy as np
+import math
 
 
 # 네트워크 초기 설정
@@ -15,8 +16,6 @@ def initialize_network(n_inputs, n_hidden, n_outputs):
 
 seed(1)
 network = initialize_network(2, 1, 2)
-for layer in network:
-    print(layer)
 
 def activate(weights, inputs):
     activation = weights[-1]
@@ -25,14 +24,13 @@ def activate(weights, inputs):
     return activation
 
 def sigmoid(activation):
-    return 1/(1+np.exp(-activation))
+    return 1/(1+math.exp(-activation))
 
 def forward_propagate(network, row):
     inputs = row
     for layer in network:
         new_inputs = []
         for neuron in layer:
-
             activation = activate(neuron['weights'], inputs)
             neuron['output'] = sigmoid(activation)
             new_inputs.append(neuron['output'])
@@ -41,7 +39,10 @@ def forward_propagate(network, row):
 
 row = [1, 0, None]
 output = forward_propagate(network, row)
-# print(output)
+for layer in network:
+    for i in layer:
+        print(i['output'])
+print("바뀌고-------------")
 
 def sigmoid_derivative(output):
     result = sigmoid(output) * (1 - sigmoid(output))
@@ -60,14 +61,20 @@ def backward_propagate_error(network, expected):
         else:
             for j in range(len(layer)):
                 neuron = layer[j]
-                errors.append(----?-----) # 역전파시 오차는 어떻게 설정했나요?
+                errors.append(expected[j] - neuron['output']) # 역전파시 오차는 어떻게 설정했나요?
         for j in range(len(layer)):
             neuron = layer[j]
-            neuron['delta'] = ----?----- # 시그모이드 함수를 사용한 역전파
+            neuron['delta'] = errors[j] * sigmoid_derivative(neuron['output']) # 시그모이드 함수를 사용한 역전파
 
 
-expected = [0, 1]
+expected = [0, 3, 2]
+print(expected.index(3))
 
-backward_propagate_error(network, expected)
-for layer in network:
-    print(layer)
+# backward_propagate_error(network, expected)
+# for layer in network:
+#     for i in layer:
+#         print(i['output'])
+#
+#         sum_error += sum([(expected[i] - outputs[i]) ** 2 for i in range(len(expected))])
+# for i in range(len(expected)):
+#     sum_error += (expected[i] - outputs[i]) ** 2
