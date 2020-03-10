@@ -49,10 +49,10 @@ class TwoLayerNet():
         N, D = X.shape
 
         # 여기에 p를 구하는 작업을 수행하세요.
-
-        h = '''?'''
-        a = '''?'''
-        o = '''?'''
+        
+        h = np.dot(W1, X) + b1
+        a = np.maximum(0, h) 
+        o = np.dot(W2, a) + b2
         p = np.exp(o)/np.sum(np.exp(o),axis=1).reshape(-1,1)
 
         if y is None:
@@ -60,7 +60,7 @@ class TwoLayerNet():
         
         # 여기에 Loss를 구하는 작업을 수행하세요.
         
-        Loss = '''?'''
+        Loss = p-y
 
 #        print('loss : ',Loss)
 
@@ -95,12 +95,14 @@ class TwoLayerNet():
                 if(j==y[i]):
                     dp[i][j]-=1
           # p-y
-        da = np.heaviside(a,0)
-
-        grads["W2"] = np.dot('''?''')
-        grads["b2"] = np.sum('''?''',axis=0)
-        grads["W1"] = np.dot('''?''')
-        grads["b1"] = np.sum('''?''',axis=0)
+        da = np.dot(dp,W2.T)
+        dr = np.heaviside(a,0)
+        dh = dr * da
+        
+        grads["W2"] = np.dot(a.T, dp)
+        grads["b2"] = np.sum(dp, axis=0)
+        grads["W1"] = np.dot(x.T, dh)
+        grads["b1"] = np.sum(dh, axis=0)
 
         self.params["W2"] -= learning_rate * grads["W2"]
         self.params["b2"] -= learning_rate * grads["b2"]
