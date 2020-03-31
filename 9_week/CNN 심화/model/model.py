@@ -96,10 +96,11 @@ class ResNet32Model(BaseModel):
                 nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
-        """
-        [TODO] 논문의 Figure 3 형태로 forward를 구성해주세요
-            - 단, 논문의 구현과는 다른 형태이기 때문에 컨셉만 맞추어 구성하시면 됩니다.
-            - layer1, residual_layers, global_avg, fc를 조합해주세요.
-        """
+        x = self.layer1(x)
+        x = self.residual_layers(x)
+        x = self.global_avg(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+
         return x        
 
